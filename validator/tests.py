@@ -6,7 +6,7 @@ from .forms import DeviceRegistrationForm
 
 class DeviceRegistrationTests(TestCase):
 
-    def test_register_device_json_response(self):
+    def test_add_device_json_response(self):
         """Test JSON response when a device is registered successfully."""
         data = {
             'name': 'Router1',
@@ -14,7 +14,7 @@ class DeviceRegistrationTests(TestCase):
             'password': 'Strongpassword123@'
         }
         
-        response = self.client.post(reverse('register_device'), data, HTTP_ACCEPT='application/json')
+        response = self.client.post(reverse('add_device'), data, HTTP_ACCEPT='application/json')
         
         # Check that the response is JSON and contains the expected data
         self.assertEqual(response.status_code, 201)
@@ -26,7 +26,7 @@ class DeviceRegistrationTests(TestCase):
         self.assertEqual(json_data['device']['name'], 'Router1')
         self.assertEqual(json_data['device']['ip_address'], '192.168.0.1')
 
-    def test_register_device_invalid_json_response(self):
+    def test_add_device_invalid_json_response(self):
         """Test JSON response when a device registration fails due to validation errors."""
         data = {
             'name': 'abcd',  # Name is missing
@@ -34,7 +34,7 @@ class DeviceRegistrationTests(TestCase):
             'password': 'weak'  # Password too short
         }
         
-        response = self.client.post(reverse('register_device'), data, HTTP_ACCEPT='application/json')
+        response = self.client.post(reverse('add_device'), data, HTTP_ACCEPT='application/json')
         
         # Check that the response is JSON and contains error messages
         self.assertEqual(response.status_code, 400)

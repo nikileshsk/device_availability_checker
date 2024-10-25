@@ -6,7 +6,7 @@ from .models import Device
 from .forms import DeviceRegistrationForm, DeviceAvailabilityForm
 
 # Device registration view
-def register_device(request):
+def add_device(request):
     success_message = None
     error_messages = []
     if request.method == 'POST':
@@ -39,7 +39,7 @@ def register_device(request):
         form = DeviceRegistrationForm()
 
     # Standard HTML response with success and error messages
-    return render(request, 'register_device.html', {
+    return render(request, 'add_device.html', {
         'form': form,
         'success_message': success_message,
         'error_messages': error_messages,
