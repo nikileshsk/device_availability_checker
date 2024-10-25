@@ -8,8 +8,10 @@ from .forms import DeviceRegistrationForm, DeviceAvailabilityForm
 # Device registration view
 def register_device(request):
     success_message = None
+    error_messages = []
     if request.method == 'POST':
         form = DeviceRegistrationForm(request.POST)
+        
         if form.is_valid():
             device = form.save(commit=False)
             # Hash the password before saving
@@ -27,18 +29,30 @@ def register_device(request):
                         'ip_address': device.ip_address
                     }
                 }, status=201)
+        else:
+            # Collect form errors for display
+            error_messages = form.errors.as_json() if request.headers.get('Accept') == 'application/json' else form.errors
+            if request.headers.get('Accept') == 'application/json' or request.GET.get('format') == 'json':
+                return JsonResponse({'errors': error_messages}, status=400)
 
     else:
         form = DeviceRegistrationForm()
 
-    # Standard HTML response
-    return render(request, 'register_device.html', {'form': form, 'success_message': success_message})
+    # Standard HTML response with success and error messages
+    return render(request, 'register_device.html', {
+        'form': form,
+        'success_message': success_message,
+        'error_messages': error_messages,
+    })
 
 
 # Check device availability view
 def check_availability(request):
+    error_message = None
+    status_message = None
     if request.method == 'POST':
         form = DeviceAvailabilityForm(request.POST)
+        
         if form.is_valid():
             device = form.cleaned_data['device']
             password = form.cleaned_data['password']
@@ -50,27 +64,30 @@ def check_availability(request):
                 if request.headers.get('Accept') == 'application/json' or request.GET.get('format') == 'json':
                     return JsonResponse({'error': error_message}, status=400)
 
-                # HTML response
-                return render(request, 'check_availability.html', {'form': form, 'error': error_message})
+            else:
+                # Simulate reachability
+                status_message = "Reachable" if random.randint(0, 1) == 0 else "Not Reachable"
+                
+                # JSON response if requested
+                if request.headers.get('Accept') == 'application/json' or request.GET.get('format') == 'json':
+                    return JsonResponse({
+                        'status': status_message,
+                        'device': {
+                            'name': device.name,
+                            'ip_address': device.ip_address
+                        }
+                    }, status=200)
 
-            # Simulate reachability
-            reachable = "Reachable" if random.randint(0, 1) == 0 else "Not Reachable"
-            
-            # JSON response if requested
-            if request.headers.get('Accept') == 'application/json' or request.GET.get('format') == 'json':
-                return JsonResponse({
-                    'status': reachable,
-                    'device': {
-                        'name': device.name,
-                        'ip_address': device.ip_address
-                    }
-                }, status=200)
-
-            # Standard HTML response
-            return render(request, 'check_availability.html', {'form': form, 'status': reachable, 'device': device})
+        else:
+            # Collect form errors for display
+            error_message = form.errors.as_json() if request.headers.get('Accept') == 'application/json' else form.errors
 
     else:
         form = DeviceAvailabilityForm()
 
-    # Standard HTML response
-    return render(request, 'check_availability.html', {'form': form})
+    # Standard HTML response with error or status message
+    return render(request, 'check_availability.html', {
+        'form': form,
+        'error': error_message,
+        'status': status_message,
+    })

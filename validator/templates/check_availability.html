@@ -17,32 +17,46 @@
                 {% load bootstrap_filter %}
                 <form method="post">
                     {% csrf_token %}
+                    
                     <div class="mb-3">
                         {{ form.device.label_tag }}
                         {{ form.device|add_class:"form-control" }}
+                        {% if form.device.errors %}
+                            <div class="text-danger">
+                                {{ form.device.errors }}
+                            </div>
+                        {% endif %}
                     </div>
+                    
                     <div class="mb-3">
                         {{ form.password.label_tag }}
                         {{ form.password|add_class:"form-control" }}
+                        {% if form.password.errors %}
+                            <div class="text-danger">
+                                {{ form.password.errors }}
+                            </div>
+                        {% endif %}
                     </div>
+
                     <button type="submit" class="btn btn-primary">Check Availability</button>
                 </form>
 
                 {% if error %}
-                <div class="alert alert-danger mt-3">
-                    {{ error }}
-                </div>
+                    <div class="alert alert-danger mt-3">
+                        {{ error }}
+                    </div>
                 {% endif %}
 
                 {% if status %}
-                <div class="alert alert-info mt-3">
-                    Status: {{ status }}
-                </div>
+                    <div class="alert alert-info mt-3">
+                        Status: {{ status }}
+                    </div>
                 {% endif %}
             </div>
         </div>
+        
         <div class="text-center mt-4">
-            <a href="{% url 'register_device' %}" class="btn btn-secondary">Go To Device Registeration</a>
+            <a href="{% url 'register_device' %}" class="btn btn-secondary">Go To Device Registration</a>
         </div>
     </div>
 
